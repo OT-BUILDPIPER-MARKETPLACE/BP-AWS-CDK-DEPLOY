@@ -1,5 +1,5 @@
 # BP-SHELL-STEP-TEMPLATE
-I'll <do xyz>
+I'll use cdk to deploy aws cdk stack applications.
 
 ## Setup
 * Clone the code available at [BP-SHELL-STEP-TEMPLATE](https://github.com/OT-BUILDPIPER-MARKETPLACE/BP-SHELL-STEP-TEMPLATE)

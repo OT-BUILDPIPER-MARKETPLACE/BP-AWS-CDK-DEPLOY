@@ -8,17 +8,23 @@ source /opt/buildpiper/shell-functions/aws-functions.sh
 TASK_STATUS=0
 
 CODEBASE_LOCATION="${WORKSPACE}"/"${CODEBASE_DIR}"
-logInfoMessage "I'll do processing at [$CODEBASE_LOCATION]"
+logInfoMessage "Executing at [$CODEBASE_LOCATION]"
 sleep  $SLEEP_DURATION
 cd  "${CODEBASE_LOCATION}"
 
 TASK_STATUS=0
 
-if [condition]; then
-    logErrorMessage "Done the required operation"
+cdk --version
+
+echo ""
+
+npm run $INSTRUCTION
+
+if [ $? -eq 0 ]; then
+    logErrorMessage "Success"
 else
     TASK_STATUS=1
-    logErrorMessage "Target server not provided please check"
+    logErrorMessage "Failed"
 
 fi
 saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
