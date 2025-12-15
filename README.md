@@ -1,22 +1,25 @@
-# BP-SHELL-STEP-TEMPLATE
-I'll use cdk to deploy aws cdk stack applications.
+# bp_s3uploader_step
+I'll let people to upload file in s3 bucket via this step
 
 ## Setup
-* Clone the code available at [BP-SHELL-STEP-TEMPLATE](https://github.com/OT-BUILDPIPER-MARKETPLACE/BP-SHELL-STEP-TEMPLATE)
-
+* Clone the code available at [BP-S3-UPLOADER-STEP](https://github.com/OT-BUILDPIPER-MARKETPLACE/BP-S3-UPLOADER-STEP)
 * Build the docker image
+
 ```
 git submodule init
 git submodule update
-docker build -t ot/<image-name>:0.1 .
+docker build -t ot/s3-uploader-step:0.1 .
 ```
 
-* Do local testing
-```
-docker run -it --rm -v $PWD:/src -e var1="key1" -e var2="key2" ot/<image-name>:0.1
-```
+* Do local testing via image only
 
-* Debug
 ```
-docker run -it --rm -v $PWD:/src -e var1="key1" -e var2="key2" --entrypoint sh ot/<image-name>:0.1
+# upload with default 
+docker run -it --rm -v $PWD:/src -e WORKSPACE=/src -e CODEBASE_DIR=/ ot/s3-uploader-step:0.1
+
+# upload with specific bucket name and file to be uploaded
+docker run -it --rm -v $PWD:/src  -e FILE_TO_BE_UPLOADED=build.sh -e S3_BUCKET=test -e WORKSPACE=/src -e CODEBASE_DIR=/ ot/s3-uploader-step:0.0.1
+
+#debug
+docker run -it --rm -v $PWD:/src -e WORKSPACE=/src -e CODEBASE_DIR=/ -e entrypoint bash ot/s3-uploader-step:0.1 
 ```
