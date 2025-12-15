@@ -8,6 +8,13 @@ RUN apt update -y && apt install -y \
     npm install -g aws-cdk@2.115.0 && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
+# Create non-root user (BuildPiper standard)
+RUN groupadd -g 65522 buildpiper && \
+    useradd -u 65522 -g buildpiper -d /home/buildpiper -s /bin/bash -m buildpiper
+
+# Fix ownership for non-root
+RUN chown -R buildpiper:buildpiper /home/buildpiper /opt /bp
+
 # Set environment variables for the Node.js versions you want to use
 ENV NODE_VERSION_12="12.18.2"
 ENV NODE_VERSION_14="14.17.0"
@@ -22,15 +29,28 @@ ENV NODE_VERSION_22_16="22.16.0"
 ENV SLEEP_DURATION 5s
 ENV INSTRUCTION ""
 
-
 ADD BP-BASE-SHELL-STEPS /opt/buildpiper/shell-functions/
 
 ENV ACTIVITY_SUB_TASK_CODE NPM_STEP 
 
-# Install Node.js versions using NVM
-RUN echo "source $HOME/.nvm/nvm.sh" >> ~/.bashrc && \
-    /bin/bash -c "source $HOME/.nvm/nvm.sh && nvm install $NODE_VERSION_12 && nvm install $NODE_VERSION_14 && nvm install $NODE_VERSION_16 && nvm install $NODE_VERSION_17 && nvm install $NODE_VERSION_20_10 && nvm install $NODE_VERSION_20_11 && nvm install $NODE_VERSION_20_13 && nvm install $NODE_VERSION_22 && nvm install $NODE_VERSION_22_16"
+# Switch to non-root
+USER buildpiper
+WORKDIR /home/buildpiper
 
-COPY build-ift.sh .    
-RUN chmod 777 build-ift.sh
-ENTRYPOINT [ "./build-ift.sh" ]
+# Install Node.js versions using NVM (non-root)
+RUN echo "source \$HOME/.nvm/nvm.sh" >> ~/.bashrc && \
+    /bin/bash -c "source \$HOME/.nvm/nvm.sh && \
+    nvm install $NODE_VERSION_12 && \
+    nvm install $NODE_VERSION_14 && \
+    nvm install $NODE_VERSION_16 && \
+    nvm install $NODE_VERSION_17 && \
+    nvm install $NODE_VERSION_20_10 && \
+    nvm install $NODE_VERSION_20_11 && \
+    nvm install $NODE_VERSION_20_13 && \
+    nvm install $NODE_VERSION_22 && \
+    nvm install $NODE_VERSION_22_16"
+
+COPY --chown=buildpiper:buildpiper build.sh .
+RUN chmod +x build.sh
+
+ENTRYPOINT [ "./build.sh" ] 
